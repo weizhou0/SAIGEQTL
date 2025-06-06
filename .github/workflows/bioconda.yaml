@@ -69,16 +69,25 @@ jobs:
           echo $VERSION $VCOMMIT $SHA256 $BUILD_NUMBER
           sed -i 's/"VERSION"/"'"$VERSION"'"/;s/"VCOMMIT"/"'"$VCOMMIT"'"/;s/"SHA256"/"'"$SHA256"'"/;s/number: *[0-9]\+/number: '"BUILD_NUMBER"'/' recipes/${{ matrix.packagename }}/meta.yaml
 
+      - name: Create config.yml file
+        run: |
+          cat <<EOF > config.yml
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+EOF
+
       - name: Lint
         shell: bash -el {0}
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         run: |
-          bioconda-utils lint --config recipes/config.yml --packages ${{ matrix.packagename }}
+          bioconda-utils lint --packages ${{ matrix.packagename }}
 
       - name: Run test
         shell: bash -el {0}
         run: |
-          bioconda-utils build --config recipes/config.yml ${{ (startsWith(matrix.os, 'ubuntu') && '--docker --mulled-test') || ''  }} --packages ${{ matrix.packagename }}
+          bioconda-utils build ${{ (startsWith(matrix.os, 'ubuntu') && '--docker --mulled-test') || ''  }} --packages ${{ matrix.packagename }}
 
       - name: Upload built package as GitHub artifact
         id: artifact-upload
