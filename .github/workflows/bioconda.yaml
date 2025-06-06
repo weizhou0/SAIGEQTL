@@ -65,8 +65,9 @@ jobs:
           VERSION="$(awk -F': *' '$1 == "Version" {print $2}' DESCRIPTION)"
           VCOMMIT="${{ github.sha }}"
           SHA256="$(curl -sL "${{ github.server_url }}/${{ github.repository }}/archive/${{ github.sha }}.tar.gz" | shasum -a 256 | cut -d " " -f 1)"
-          echo $VERSION $VCOMMIT $SHA256
-          sed -i.bak 's/"VERSION"/"'"$VERSION"'"/;s/"VCOMMIT"/"'"$VCOMMIT"'"/;s/"SHA256"/"'"$SHA256"'"/' recipes/${{ matrix.packagename }}/meta.yaml
+          USERNAME=$(cut -d/ -f1 <<< "${{ github.repository }}")
+          echo $VERSION $VCOMMIT $SHA256 $USERNAME
+          sed -i.bak 's/"VERSION"/"'"$VERSION"'"/;s/"VCOMMIT"/"'"$VCOMMIT"'"/;s/"SHA256"/"'"$SHA256"'"/;s/"USERNAME"/"'"$USERNAME"'"/' recipes/${{ matrix.packagename }}/meta.yaml
           rm recipes/${{ matrix.packagename }}/meta.yaml.bak
 
       - name: Create config.yml file

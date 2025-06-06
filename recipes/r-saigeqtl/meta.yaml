@@ -2,13 +2,14 @@
 {% set version = "VERSION" %}
 {% set vcommit = "VCOMMIT" %}
 {% set sha = "SHA256" %}
+{% set username = "USERNAME" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://github.com/weizhou0/qtl/archive/{{ vcommit }}.tar.gz
+  url: https://github.com/{{ username }}/qtl/archive/{{ vcommit }}.tar.gz
   sha256: {{ sha }}
   patches:
     - patches/0001-use-shared-libs-in-makevars.patch
@@ -93,12 +94,12 @@ test:
     - createSparseGRM.R --help
 
 about:
-  home: https://github.com/weizhou0/qtl
+  home: https://github.com/{{ username }}/qtl
   license: GPL-3.0-only
   license_family: GPL3
   license_file: LICENSE
   summary: SAIGE-QTL is an R package developed for scalable and accurate expression quantitative trait locus (QTL) mapping for single-cell studies
-  dev_url: https://github.com/weizhou0/qtl
+  dev_url: https://github.com/{{ username }}/qtl
   doc_url: https://weizhou0.github.io/SAIGE-QTL-doc
 
 extra:
