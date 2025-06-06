@@ -1,0 +1,106 @@
+{% set name = "r-saigeqtl" %}
+{% set version = "VERSION" %}
+{% set vcommit = "VCOMMIT" %}
+{% set sha = "SHA256" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://github.com/weizhou0/qtl/archive/{{ vcommit }}.tar.gz
+  sha256: {{ sha }}
+  patches:
+    - patches/0001-use-shared-libs-in-makevars.patch
+    - patches/0002-suggest-fastSave-in-description.patch
+
+build:
+  number: 0
+  rpaths:
+    - lib/R/lib/
+    - lib/
+  run_exports:
+    - {{ pin_subpackage('r-saigeqtl', max_pin="x.x") }}
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+  host:
+    - boost-cpp
+    - libblas
+    - liblapack
+    - superlu
+    - savvy
+    - zstd
+    - zlib
+    - r-base
+    - r-bh
+    - r-data.table
+    - r-devtools
+    - r-dplyr
+    - r-dbplyr
+    - r-ellipsis
+    - r-matrix
+    - r-optparse
+    - r-qlcmatrix
+    - r-rcpp
+    - r-rcpparmadillo >=0.10.7.5
+    - r-rcppeigen
+    - r-rcppparallel
+    - r-rhpcblasctl
+    - r-roxygen2
+    - r-rversions
+    - r-r.utils
+    - r-rsqlite
+    - r-spatest ==3.1.2
+    - r-skat
+    - r-metaskat
+    - r-vctrs
+    - r-furrr
+    - r-rcppnumerical
+    - r-nlme
+    - r-mass
+  run:
+    - r-base
+    - libblas
+    - liblapack
+    - boost-cpp
+    - savvy
+    - r-data.table
+    - r-dplyr
+    - r-dbplyr
+    - r-matrix
+    - r-optparse
+    - r-rcpp >=1.0.7
+    - r-rcpparmadillo >=0.10.7.5
+    - r-rcppeigen
+    - r-rcppparallel
+    - r-rhpcblasctl
+    - r-skat
+    - r-spatest
+    - r-rsqlite
+    - r-rcppnumerical
+    - r-furrr
+
+test:
+  commands:
+    - $R -e "library(\"SAIGEQTL\")"
+    - step1_fitNULLGLMM_qtl.R --help
+    - step2_tests_qtl.R --help
+    - step3_gene_pvalue_qtl.R --help
+    - makeGroupFile.R --help
+    - createSparseGRM.R --help
+
+about:
+  home: https://github.com/weizhou0/qtl
+  license: GPL-3.0-only
+  license_family: GPL3
+  license_file: LICENSE
+  summary: SAIGE-QTL is an R package developed for scalable and accurate expression quantitative trait locus (QTL) mapping for single-cell studies
+  dev_url: https://github.com/weizhou0/qtl
+  doc_url: https://weizhou0.github.io/SAIGE-QTL-doc
+
+extra:
+  recipe-maintainers:
+    - weizhouUMICH

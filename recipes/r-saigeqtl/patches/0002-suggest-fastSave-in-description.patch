@@ -1,0 +1,14 @@
+diff --git a/DESCRIPTION b/DESCRIPTION
+--- a/DESCRIPTION
++++ b/DESCRIPTION
+@@ -7,8 +7,8 @@
+ Maintainer: Wei Zhou <wzhou@broadinstitute.org>
+ Description:an R package that implements the Scalable and Accurate Implementation of Generalized Poisson mixed model for eQTL mapping at the single-cell level.
+ License: GPL (>= 2)
+-Imports: Rcpp (>= 1.0.7), RcppParallel, Matrix, data.table, RcppArmadillo (>= 0.10.7.5), RcppNumerical, furrr, fastSave, dbplyr
+-Suggests: R.utils
++Imports: Rcpp (>= 1.0.7), RcppParallel, Matrix, data.table, RcppArmadillo (>= 0.10.7.5), RcppNumerical, furrr, dbplyr
++Suggests: R.utils, fastSave
+ LinkingTo: Rcpp, RcppArmadillo (>= 0.10.7.5), RcppParallel, data.table, SPAtest (== 3.1.2),
+         RcppEigen, Matrix, methods, BH, optparse, SKAT, MetaSKAT, qlcMatrix, RhpcBLASctl, RSQLite, dplyr, nlme, MASS, RcppEigen, RcppNumerical
+ Remotes: cysouw/qlcMatrix, leeshawn/MetaSKAT, barkasn/fastSave

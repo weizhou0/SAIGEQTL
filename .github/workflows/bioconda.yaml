@@ -1,0 +1,88 @@
+name: Tests
+
+on:
+  push:
+    branches: [ "main" ]
+    # Publish semver tags as releases.
+    tags: [ 'v*.*.*' ]
+    paths-ignore:
+      - 'README.md'
+  pull_request:
+    branches: [ "main" ]
+    paths-ignore:
+      - 'README.md'
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-13, macos-latest]
+        packagename: ["r-saigeqtl"]
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Setup Miniforge
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: biobuild
+          channels: conda-forge,bioconda,defaults
+          auto-activate-base: false
+          miniforge-version: latest
+          use-mamba: true
+
+      - name: Get Date
+        id: get-date
+        run: echo "today=$(/bin/date -u '+%Y%m%d')" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Cache Conda env
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CONDA }}/envs
+          key:
+            conda-${{ runner.os }}--${{ runner.arch }}--${{ steps.get-date.outputs.today }}-${{ env.CACHE_NUMBER }}
+        env:
+          # Increase this value to reset cache if needed
+          CACHE_NUMBER: 0
+        id: cache
+
+      - name: Install biobuild environment
+        shell: bash -el {0}
+        run:
+          mamba create -y -n biobuild -c conda-forge -c bioconda -c nodefaults bioconda-utils anaconda-client
+        if: steps.cache.outputs.cache-hit != 'true'
+    
+      - name: Set package metadata
+        run: |
+          VERSION="$(grep -Po '^Version:\s*\K.*$' DESCRIPTION)"
+          VCOMMIT="${{ github.sha }}"
+          SHA256="$(curl -sL "${{ github.server_url }}/${{ github.repository }}/archive/${{ github.sha }}.tar.gz" | shasum -a 256 | cut -d " " -f 1)"
+          BUILD_NUMBER="${{ github.run_number }}"
+          sed -i 's/"VERSION"/"'"$VERSION"'"/;s/"VCOMMIT"/"'"$VCOMMIT"'"/;s/"SHA256"/"'"$SHA256"'"/;s/number: *[0-9]\+/number: '"BUILD_NUMBER"'/' recipes/${{ matrix.packagename }}/meta.yaml
+
+      - name: Lint
+        shell: bash -el {0}
+        if: ${{ startsWith(matrix.os, 'ubuntu') }}
+        run: |
+          bioconda-utils lint --packages ${{ matrix.packagename }}
+
+      - name: Run test
+        shell: bash -el {0}
+        run: |
+          bioconda-utils build ${{ (startsWith(matrix.os, 'ubuntu') && '--docker --mulled-test') || ''  }} --packages ${{ matrix.packagename }}
+
+      - name: Upload built package as GitHub artifact
+        id: artifact-upload
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: ${{ matrix.packagename }}-${{ matrix.os }}
+          path: ${{ env.CONDA }}/envs/biobuild/conda-bld/
+          if-no-files-found: 'ignore'
