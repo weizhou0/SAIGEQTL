@@ -62,22 +62,23 @@ jobs:
     
       - name: Set package metadata
         run: |
-          VERSION="$(grep -Po '^Version:\s*\K.*$' DESCRIPTION)"
+          VERSION="$(awk -F': *' '$1 == "Version" {print $2}' DESCRIPTION)"
           VCOMMIT="${{ github.sha }}"
           SHA256="$(curl -sL "${{ github.server_url }}/${{ github.repository }}/archive/${{ github.sha }}.tar.gz" | shasum -a 256 | cut -d " " -f 1)"
           BUILD_NUMBER="${{ github.run_number }}"
+          echo $VERSION $VCOMMIT $SHA256 $BUILD_NUMBER
           sed -i 's/"VERSION"/"'"$VERSION"'"/;s/"VCOMMIT"/"'"$VCOMMIT"'"/;s/"SHA256"/"'"$SHA256"'"/;s/number: *[0-9]\+/number: '"BUILD_NUMBER"'/' recipes/${{ matrix.packagename }}/meta.yaml
 
       - name: Lint
         shell: bash -el {0}
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         run: |
-          bioconda-utils lint --packages ${{ matrix.packagename }}
+          bioconda-utils lint --config recipes/config.yml --packages ${{ matrix.packagename }}
 
       - name: Run test
         shell: bash -el {0}
         run: |
-          bioconda-utils build ${{ (startsWith(matrix.os, 'ubuntu') && '--docker --mulled-test') || ''  }} --packages ${{ matrix.packagename }}
+          bioconda-utils build --config recipes/config.yml ${{ (startsWith(matrix.os, 'ubuntu') && '--docker --mulled-test') || ''  }} --packages ${{ matrix.packagename }}
 
       - name: Upload built package as GitHub artifact
         id: artifact-upload
