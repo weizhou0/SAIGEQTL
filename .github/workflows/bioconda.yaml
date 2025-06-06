@@ -72,7 +72,7 @@ jobs:
 
       - name: Create config.yml file
         run: |
-          echo -e "channels:\n  -conda-forge\n  -bioconda\n  -defaults" > config.yml
+          echo -e "channels:\n  - conda-forge\n  - bioconda\n  - defaults" > config.yml
 
       - name: Lint
         shell: bash -el {0}
