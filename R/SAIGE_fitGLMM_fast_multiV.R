@@ -674,8 +674,8 @@ fitNULLGLMM_multiV <- function(plinkFile = "",
     )
 
     if (length(offsetCol) > 0) {
-      data.new <- cbind(data.new, dataMerge_sort[,which(colnames(dataMerge_sort) == offsetCol)])
-      colnames(data.new)[ncol(data.new)] = offsetCol
+      data.new <- cbind(data.new, dataMerge_sort[, which(colnames(dataMerge_sort) == offsetCol)])
+      colnames(data.new)[ncol(data.new)] <- offsetCol
     }
   } else {
     formula.new <- formula.null
