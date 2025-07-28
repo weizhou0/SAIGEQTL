@@ -1,12 +1,7 @@
-#!/usr/bin/env Rscript
+#!/usr/bin/env -S pixi run --manifest-path /app/pixi.toml Rscript
 
 # options(stringsAsFactors=F, scipen = 999)
 options(stringsAsFactors = F)
-# library(SAIGE)
-# library(SAIGE, lib.loc="/humgen/atgu1/fin/wzhou/projects/eQTL_method_dev/tool_dev/installs_test/")
-# library(SAIGEQTL, lib.loc="/humgen/atgu1/fin/wzhou/projects/eQTL_method_dev/tool_dev/installs_test_2.1.2_rareCategoryVR_0128_SPA")
-# library(SAIGEQTL, lib.loc="/humgen/atgu1/fin/wzhou/projects/eQTL_method_dev/tool_dev/installs_test_2.1.2_rareCategoryVR_0128_SPA_smallMemory")
-# library(SAIGEQTL, lib.loc="/humgen/atgu1/fin/wzhou/projects/eQTL_method_dev/tool_dev/installs_test_2.1.2_rareCategoryVR_0128_sparseVworks")
 library(SAIGEQTL)
 
 

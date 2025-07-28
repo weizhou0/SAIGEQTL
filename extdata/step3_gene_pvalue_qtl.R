@@ -1,9 +1,8 @@
-#!/usr/bin/env Rscript
+#!/usr/bin/env -S pixi run --manifest-path /app/pixi.toml Rscript
 
 # options(stringsAsFactors=F, scipen = 999)
 options(stringsAsFactors = F)
 library(SAIGEQTL)
-# library(SAIGE, lib.loc="/humgen/atgu1/fin/wzhou/projects/eQTL_method_dev/tool_dev/installs_test/")
 BLASctl_installed <- require(RhpcBLASctl)
 library(optparse)
 library(data.table)
