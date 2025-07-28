@@ -12,4 +12,6 @@ extdata/input/nfam_100_nindep_0_step1_includeMoreRareVariants_poly.raw
 extdata/output/*
 extdata/GMMAT*
 extdata/*log
+extdata/*rda
+extdata/*varianceRatio.txt
 configure
