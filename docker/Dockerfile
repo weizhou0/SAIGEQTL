@@ -18,7 +18,8 @@ COPY . .
 RUN curl -fsSL https://pixi.sh/install.sh | sh && \
     mv /root/.pixi/bin/pixi /bin && pixi install && \
     rm -rf /root/.cache && \
-    pixi run Rscript -e 'install.packages("lintools", repos="https://cloud.r-project.org")'
+    pixi run Rscript -e 'install.packages("lintools", repos="https://cloud.r-project.org")' && \
+    pixi run Rscript -e 'install.packages("remotes", repos="https://cloud.r-project.org"); remotes::install_github("barkasn/fastSave")'
 
 RUN curl -L https://github.com/chrchang/plink-ng/archive/refs/tags/v2.0.0-a.6.16.tar.gz | tar -zx && \
     mv plink-ng-2.0.0-a.6.16 plink-ng && \
