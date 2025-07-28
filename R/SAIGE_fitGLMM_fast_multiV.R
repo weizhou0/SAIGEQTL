@@ -79,6 +79,7 @@ fitNULLGLMM_multiV <- function(plinkFile = "",
                                skipModelFitting = FALSE,
                                memoryChunk = 2,
                                tauInit = c(0, 0),
+			       isEstimateTauInit = FALSE,
                                LOCO = TRUE,
                                isLowMemLOCO = FALSE,
                                traceCVcutoff = 0.0025,
@@ -674,8 +675,8 @@ fitNULLGLMM_multiV <- function(plinkFile = "",
     )
 
     if (length(offsetCol) > 0) {
-      data.new <- cbind(data.new, dataMerge_sort[, which(colnames(dataMerge_sort) == offsetCol)])
-      colnames(data.new)[ncol(data.new)] <- offsetCol
+      data.new <- cbind(data.new, dataMerge_sort[,which(colnames(dataMerge_sort) == offsetCol)])
+      colnames(data.new)[ncol(data.new)] = offsetCol
     }
   } else {
     formula.new <- formula.null
@@ -956,6 +957,19 @@ fitNULLGLMM_multiV <- function(plinkFile = "",
         fit0 <- glm(formula.new, data = data.new, offset = offsetTotal, family = "poisson", weights = varWeights)
       }
     }
+
+  if(isEstimateTauInit){
+    data.new$IIDgeno = dataMerge_sort$IID
+    data.new$resid_pearson <- residuals(fit0, type = "pearson")
+    mean_resid <- mean(data.new$resid_pearson, na.rm = TRUE)
+    grouped_data <- dplyr::group_by(data.new, IIDgeno)
+    subject_resid <- dplyr::summarise(grouped_data, mean_resid = mean(resid_pearson, na.rm = TRUE))
+    tauInit[2] = max(1e-4, var(subject_resid$mean_resid))
+  }
+
+   
+
+
   } else if (traitType == "count_nb") {
     cat(phenoCol, " is a count_nb trait\n")
     if (isRemoveZerosinPheno) {
@@ -1036,7 +1050,7 @@ fitNULLGLMM_multiV <- function(plinkFile = "",
         chromosomeEndIndexVec = chromosomeEndIndexVec,
         traceCVcutoff = traceCVcutoff, isCovariateTransform = isCovariateTransform,
         isDiagofKinSetAsOne = isDiagofKinSetAsOne,
-        isLowMemLOCO = isLowMemLOCO, covarianceIdxMat = covarianceIdxMat, isStoreSigma = isStoreSigma, useSparseGRMtoFitNULL = useSparseGRMtoFitNULL, useGRMtoFitNULL = useGRMtoFitNULL, isSparseGRMIdentity = isSparseGRMIdentity
+        isLowMemLOCO = isLowMemLOCO, covarianceIdxMat = covarianceIdxMat, isStoreSigma = isStoreSigma, useSparseGRMtoFitNULL = useSparseGRMtoFitNULL, useGRMtoFitNULL = useGRMtoFitNULL, isSparseGRMIdentity = isSparseGRMIdentity, isEstimateTauInit=isEstimateTauInit
       ))
       modglmm$obj.glm.null$model <- as.data.frame(modglmm$obj.glm.null$model)
     } else {
@@ -2036,7 +2050,7 @@ extractVarianceRatio_multiV <- function(obj.glmm.null,
 
 
 # Fits the null glmm
-glmmkin.ai_PCG_Rcpp_multiV <- function(bedFile, bimFile, famFile, Xorig, isCovariateOffset, fit0, tau = c(0, 0), fixtau = c(0, 0), maxiter = 20, tol = 0.02, verbose = TRUE, nrun = 30, tolPCG = 1e-5, maxiterPCG = 500, subPheno, indicatorGenoSamplesWithPheno, obj.noK, out.transform, tauInit, memoryChunk, LOCO, chromosomeStartIndexVec, chromosomeEndIndexVec, traceCVcutoff, isCovariateTransform, isDiagofKinSetAsOne, isLowMemLOCO, covarianceIdxMat = NULL, isStoreSigma = FALSE, useSparseGRMtoFitNULL = TRUE, useGRMtoFitNULL = TRUE, isSparseGRMIdentity = FALSE) {
+glmmkin.ai_PCG_Rcpp_multiV <- function(bedFile, bimFile, famFile, Xorig, isCovariateOffset, fit0, tau = c(0, 0), fixtau = c(0, 0), maxiter = 20, tol = 0.02, verbose = TRUE, nrun = 30, tolPCG = 1e-5, maxiterPCG = 500, subPheno, indicatorGenoSamplesWithPheno, obj.noK, out.transform, tauInit, memoryChunk, LOCO, chromosomeStartIndexVec, chromosomeEndIndexVec, traceCVcutoff, isCovariateTransform, isDiagofKinSetAsOne, isLowMemLOCO, covarianceIdxMat = NULL, isStoreSigma = FALSE, useSparseGRMtoFitNULL = TRUE, useGRMtoFitNULL = TRUE, isSparseGRMIdentity = FALSE, glmmkin.ai_PCG_Rcpp_multiV = FALSE, isEstimateTauInit = FALSE) {
   # Fits the null generalized linear mixed model for a poisson, binomial, and gaussian
   # Args:
   #  genofile: string. Plink file for the M1 markers to be used to construct the genetic relationship matrix
@@ -2316,6 +2330,16 @@ glmmkin.ai_PCG_Rcpp_multiV <- function(bedFile, bimFile, famFile, Xorig, isCovar
         i <- maxiter
         break
       }
+
+
+      if(isEstimateTauInit){
+	if (max(abs(tau - tau0) / (abs(tau0) + tol)) > 100) {
+		tau = tau0
+		eta = eta0
+		break
+	}
+      }	
+
     }
   }
 
