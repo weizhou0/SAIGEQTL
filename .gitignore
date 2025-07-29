@@ -19,3 +19,6 @@ extdata/step1_multiV_singleV.lo
 extdata/temp111.cpp
 extdata/NB.R
 extdata/time.var.txt
+R/*.log
+R/*.lo
+R/.nfs00000013331217950004b123
