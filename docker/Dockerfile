@@ -30,5 +30,8 @@ RUN mv extdata/step1_fitNULLGLMM_qtl.R extdata/step2_tests_qtl.R extdata/step3_g
    step3_gene_pvalue_qtl.R --help && \
    makeGroupFile.R --help
 
+RUN mv extdata/input/ /usr/local/bin/
+RUN mv extdata/output/ /usr/local/bin/
+
 RUN rm -r src/
 RUN rm -r R/
