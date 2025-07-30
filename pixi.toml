@@ -2,34 +2,60 @@
 channels = ["conda-forge", "bioconda"]
 name = "SAIGEQTL"
 platforms = ["linux-64", "osx-64"]
-version = "0.1.0"
+version = "0.3.2"
 
 [tasks]
+install-github-deps = "Rscript -e 'if(!require(remotes)) install.packages(\"remotes\"); remotes::install_github(c(\"cysouw/qlcMatrix\", \"leeshawn/MetaSKAT\", \"barkasn/fastSave\"))'"
+build = "R CMD INSTALL ."
+test = "Rscript -e 'library(SAIGEQTL); cat(\"SAIGE-QTL loaded successfully\\n\")'"
 
 [dependencies]
+# System dependencies
 boost-cpp = "*"
 cget = "*"
 openblas = "*"
-r = "*"
-r-bh = "*"
-r-cpp11 = "*"
+zlib = "*"
+zstd = "*"
+savvy = "*"
+superlu = "*"
+
+# R and core packages
+r-base = ">=4.0"
 r-devtools = "*"
+
+# Core R computational packages
+r-rcpp = "*"
 r-rcpparmadillo = "*"
 r-rcppeigen = "*"
 r-rcppparallel = "*"
+r-rcppnumerical = "*"
+r-bh = "*"
+r-cpp11 = "*"
+
+# Data manipulation and I/O
 "r-data.table" = "*"
 r-dplyr = "*"
+r-dbplyr = "*"
+r-matrix = "*"
+r-furrr = "*"
+
+# Standard R packages
+r-nlme = "*"
+r-mass = "*"
+
+# Statistical packages
+r-skat = "*"
 r-metaskat = "*"
+r-spatest = "*"
+
+# Utility packages
 r-optparse = "*"
-r-qlcmatrix = "*"
 r-rhpcblasctl = "*"
 r-rsqlite = "*"
-r-skat = "*"
-r-spatest = "*"
-r-rcppnumerical = "*"
-r-furrr = "*"
-r-dbplyr = "*"
-savvy = "*"
-superlu = "*"
-zlib = "*"
-zstd = "*"
+r-remotes = "*"
+
+# Note: Some packages not available in conda channels:
+# - qlcMatrix (GitHub: cysouw/qlcMatrix)
+# - MetaSKAT (GitHub: leeshawn/MetaSKAT)
+# - fastSave (GitHub: barkasn/fastSave)
+# These are handled via the install-github-deps task
