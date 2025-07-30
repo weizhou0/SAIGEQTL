@@ -21,7 +21,9 @@ RUN curl -fsSL https://pixi.sh/install.sh | sh && \
     pixi run Rscript -e 'install.packages("lintools", repos="https://cloud.r-project.org")' && \
     pixi run Rscript -e 'install.packages("remotes", repos="https://cloud.r-project.org"); remotes::install_github("barkasn/fastSave")'
 
-RUN pixi run R CMD INSTALL .
+#RUN pixi run R CMD INSTALL .
+RUN pixi run Rscript -e 'install.packages(".", repos=NULL, type="source")'
+
 
 RUN mv extdata/step1_fitNULLGLMM_qtl.R extdata/step2_tests_qtl.R extdata/step3_gene_pvalue_qtl.R extdata/makeGroupFile.R /usr/local/bin/ && \ 
    chmod a+x /usr/local/bin/step1_fitNULLGLMM_qtl.R /usr/local/bin/step2_tests_qtl.R /usr/local/bin/step3_gene_pvalue_qtl.R /usr/local/bin/makeGroupFile.R && \
@@ -30,8 +32,6 @@ RUN mv extdata/step1_fitNULLGLMM_qtl.R extdata/step2_tests_qtl.R extdata/step3_g
    step3_gene_pvalue_qtl.R --help && \
    makeGroupFile.R --help
 
-RUN mv extdata/input/ /usr/local/bin/
-RUN mv extdata/output/ /usr/local/bin/
 
 RUN rm -r src/
 RUN rm -r R/
