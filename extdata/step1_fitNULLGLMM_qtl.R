@@ -66,8 +66,8 @@ option_list <- list(
     help = "Required. Column name of sample IDs in the phenotype file, e.g. IID"
   ),
   make_option("--cellIDColinphenoFile",
-    type = "character", default = "barcode",
-    help = "Column name of cell IDs in the phenotype file, e.g. barcode"
+    type = "character", default = "",
+    help = "Column name of cell IDs in the phenotype file, e.g. barcode, default=[""]"
   ),
   make_option("--tol",
     type = "numeric", default = 0.02,
