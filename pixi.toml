@@ -2,7 +2,7 @@
 channels = ["conda-forge", "bioconda"]
 name = "SAIGEQTL"
 platforms = ["linux-64", "osx-64"]
-version = "0.1.0"
+version = "0.3.2"
 
 [tasks]
 

@@ -24,14 +24,18 @@ RUN curl -fsSL https://pixi.sh/install.sh | sh && \
 #RUN pixi run R CMD INSTALL .
 RUN pixi run Rscript -e 'install.packages(".", repos=NULL, type="source")'
 
-
-RUN mv extdata/step1_fitNULLGLMM_qtl.R extdata/step2_tests_qtl.R extdata/step3_gene_pvalue_qtl.R extdata/makeGroupFile.R /usr/local/bin/ && \ 
-   chmod a+x /usr/local/bin/step1_fitNULLGLMM_qtl.R /usr/local/bin/step2_tests_qtl.R /usr/local/bin/step3_gene_pvalue_qtl.R /usr/local/bin/makeGroupFile.R && \
-   step1_fitNULLGLMM_qtl.R --help && \
-   step2_tests_qtl.R --help && \
-   step3_gene_pvalue_qtl.R --help && \
-   makeGroupFile.R --help
-
+# Create Singularity-compatible wrapper scripts
+RUN for script in step1_fitNULLGLMM_qtl.R step2_tests_qtl.R step3_gene_pvalue_qtl.R makeGroupFile.R; do \
+      echo '#!/bin/bash' > /usr/local/bin/$script && \
+      echo 'export PATH="/root/.pixi/envs/default/bin:$PATH"' >> /usr/local/bin/$script && \
+      echo 'export LD_LIBRARY_PATH="/root/.pixi/envs/default/lib:$LD_LIBRARY_PATH"' >> /usr/local/bin/$script && \
+      echo 'exec /root/.pixi/envs/default/bin/Rscript /app/extdata/'$script' "$@"' >> /usr/local/bin/$script && \
+      chmod +x /usr/local/bin/$script; \
+    done && \
+    step1_fitNULLGLMM_qtl.R --help && \
+    step2_tests_qtl.R --help && \
+    step3_gene_pvalue_qtl.R --help && \
+    makeGroupFile.R --help
 
 RUN rm -r src/
 RUN rm -r R/
