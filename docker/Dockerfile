@@ -9,8 +9,10 @@ ENV OMP_NUM_THREADS=1
 ENV PIXI_NO_PATH_UPDATE=1
 
 RUN apt-get update -qq && \
-    apt-get -y install curl time \
-    && rm -rf /var/lib/apt/lists/*
+    apt-get install -y pigz && \
+    apt-get -y install curl time && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY . .
@@ -25,11 +27,11 @@ RUN curl -fsSL https://pixi.sh/install.sh | sh && \
 RUN pixi run Rscript -e 'install.packages(".", repos=NULL, type="source")'
 
 # Create Singularity-compatible wrapper scripts
+# Create Singularity-compatible wrapper scripts
 RUN for script in step1_fitNULLGLMM_qtl.R step2_tests_qtl.R step3_gene_pvalue_qtl.R makeGroupFile.R; do \
       echo '#!/bin/bash' > /usr/local/bin/$script && \
-      echo 'export PATH="/root/.pixi/envs/default/bin:$PATH"' >> /usr/local/bin/$script && \
-      echo 'export LD_LIBRARY_PATH="/root/.pixi/envs/default/lib:$LD_LIBRARY_PATH"' >> /usr/local/bin/$script && \
-      echo 'exec /root/.pixi/envs/default/bin/Rscript /app/extdata/'$script' "$@"' >> /usr/local/bin/$script && \
+      echo 'cd /app' >> /usr/local/bin/$script && \
+      echo 'exec pixi run Rscript /app/extdata/'$script' "$@"' >> /usr/local/bin/$script && \
       chmod +x /usr/local/bin/$script; \
     done && \
     step1_fitNULLGLMM_qtl.R --help && \
