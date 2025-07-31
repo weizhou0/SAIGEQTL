@@ -39,5 +39,7 @@ RUN for script in step1_fitNULLGLMM_qtl.R step2_tests_qtl.R step3_gene_pvalue_qt
     step3_gene_pvalue_qtl.R --help && \
     makeGroupFile.R --help
 
+RUN mv extdata/input/ /usr/local/bin/
+
 RUN rm -r src/
 RUN rm -r R/
